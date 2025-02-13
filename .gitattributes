@@ -1,0 +1,2 @@
+files/chroma/*.sqlite3 filter=lfs diff=lfs merge=lfs -text
+files/chroma/**/*.bin filter=lfs diff=lfs merge=lfs -text
