@@ -1,4 +1,4 @@
-from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFLoader, DirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
@@ -12,6 +12,12 @@ def pdf_loader(path):
     return pdf_document
 
 
+def directory_loader(path):
+    loader = DirectoryLoader(path=path, glob="*.pdf", loader_cls=PyPDFLoader)
+    docs = loader.load()
+    return docs
+
+
 def document_split(doc):
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,
@@ -20,5 +26,5 @@ def document_split(doc):
     texts = text_splitter.split_documents(doc)
     print(f"✅ Split into {len(texts)} chunks")
     for i, chunk in enumerate(texts[:5]):  # Show first 5 chunks
-        print(f"Chunk {i+1}: {chunk.page_content[:200]}...")
+        print(f"Chunk {i + 1}: {chunk.page_content[:200]}...")
     return texts

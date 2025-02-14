@@ -4,8 +4,9 @@ from langchain_core.runnables import RunnableParallel, RunnableLambda
 
 from helpers.Models import get_embedding, get_llm
 from helpers.Prompt import prompt_template
+from helpers.Upload import upload_and_save
 from helpers.VectorStore import create_vector_db
-from tools.DocumentProcessing import pdf_loader, document_split
+from tools.DocumentProcessing import pdf_loader, document_split, directory_loader
 
 import gradio as gr
 
@@ -14,9 +15,12 @@ FILE_PATH = 'files/Machine_Learning_Theory_QA_-AI___MLOps.pdf'
 EMBEDDING_MODEL = 'mixedbread-ai/mxbai-embed-large-v1'
 LLM_MODEL = 'HuggingFaceH4/zephyr-7b-beta'
 
+uploaded_file = 'files/uploads/'
+
 
 def get_context_info(question):
-    document = pdf_loader(FILE_PATH)
+    # document = pdf_loader(uploaded_file)
+    document = directory_loader(uploaded_file)
     split = document_split(document)
     embedding_model = get_embedding(model_path=EMBEDDING_MODEL)
     vector_db = create_vector_db(split, embedding_model)
@@ -53,15 +57,11 @@ if __name__ == '__main__':
     with gr.Blocks() as app:
         gr.Markdown("## RAG-based QA from Documents")
 
-        # file_upload = gr.File(label="Upload a PDF File", type="file")
-        # process_button = gr.Button("Process File")
+        upload_button = gr.UploadButton("Click to Upload a file")
+        upload_button.upload(upload_and_save, upload_button)
         question_input = gr.Textbox(label="Ask a Question")
         answer_output = gr.Textbox(label="Answer", interactive=False)
         query_button = gr.Button("Get Answer")
-
-        # process_button.click(process_file, inputs=[file_upload], outputs=[])
         query_button.click(query_rag, inputs=[question_input], outputs=[answer_output])
 
     app.launch()
-
-
